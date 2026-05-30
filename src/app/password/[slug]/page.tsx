@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, use } from 'react'
-import { useRouter } from 'next/navigation'
 import { Lock, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
@@ -12,7 +11,6 @@ export default function PasswordPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = use(params)
-  const router = useRouter()
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -29,7 +27,7 @@ export default function PasswordPage({
       })
       const data = await res.json()
       if (res.ok) {
-        router.push(`/${slug}`)
+        window.location.href = `/${slug}`
       } else {
         setError(data.error ?? 'Incorrect password')
       }
