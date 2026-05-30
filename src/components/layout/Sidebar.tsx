@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { BarChart2, Link2, LayoutDashboard, Settings } from 'lucide-react'
+import { BarChart2, LayoutDashboard, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const nav = [
@@ -17,7 +18,7 @@ export function Sidebar() {
     <aside className="w-56 shrink-0 border-r border-gray-200 bg-white flex flex-col">
       <div className="h-14 flex items-center px-5 border-b border-gray-200">
         <Link href="/dashboard" className="flex items-center gap-2 font-bold text-gray-900">
-          <Link2 className="h-5 w-5 text-blue-600" />
+          <Image src="/logo.png" alt="Wshort" width={24} height={24} className="rounded" />
           <span>Wshort</span>
         </Link>
       </div>

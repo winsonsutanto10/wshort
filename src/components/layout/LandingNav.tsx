@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Link2 } from 'lucide-react'
+import Image from 'next/image'
 import { useUser } from '@clerk/nextjs'
 
 export function LandingNav() {
@@ -11,7 +11,7 @@ export function LandingNav() {
     <nav className="border-b border-gray-200">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-gray-900">
-          <Link2 className="h-5 w-5 text-blue-600" />
+          <Image src="/logo.png" alt="Wshort" width={24} height={24} className="rounded" />
           Wshort
         </div>
         <div className="flex items-center gap-3">
