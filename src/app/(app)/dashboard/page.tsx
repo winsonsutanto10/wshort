@@ -7,14 +7,23 @@ export default async function DashboardPage() {
   const { userId } = await auth()
   if (!userId) return null
 
-  const { data: links } = await supabaseAdmin
-    .from('links')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(50)
+  const [{ data: links }, { data: userSettings }] = await Promise.all([
+    supabaseAdmin
+      .from('links')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(50),
+    supabaseAdmin
+      .from('user_settings')
+      .select('link_quota')
+      .eq('user_id', userId)
+      .maybeSingle(),
+  ])
 
-  const totalClicks = (links ?? []).reduce((sum, l) => sum + l.click_count, 0)
+  const linkList = links ?? []
+  const quota = userSettings?.link_quota ?? 3
+  const totalClicks = linkList.reduce((sum, l) => sum + l.click_count, 0)
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -25,16 +34,16 @@ export default async function DashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <StatCard label="Total Links" value={(links ?? []).length} />
+        <StatCard label="Total Links" value={linkList.length} />
         <StatCard label="Total Clicks" value={totalClicks} />
         <StatCard
           label="Active Links"
-          value={(links ?? []).filter((l) => l.is_active).length}
+          value={linkList.filter((l) => l.is_active).length}
         />
       </div>
 
-      <CreateLinkForm />
-      <LinkTable initialLinks={links ?? []} />
+      <CreateLinkForm linkCount={linkList.length} quota={quota} />
+      <LinkTable initialLinks={linkList} />
     </div>
   )
 }

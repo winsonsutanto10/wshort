@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -12,6 +12,7 @@ import { cn, formatDate, formatNumber, copyToClipboard } from '@/lib/utils'
 export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
   const router = useRouter()
   const [links, setLinks] = useState(initialLinks)
+  useEffect(() => { setLinks(initialLinks) }, [initialLinks])
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 

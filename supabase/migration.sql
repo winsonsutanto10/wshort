@@ -67,6 +67,15 @@ CREATE INDEX IF NOT EXISTS api_keys_key_hash_idx
 CREATE INDEX IF NOT EXISTS api_keys_user_id_idx
   ON api_keys (user_id);
 
+CREATE TABLE IF NOT EXISTS user_settings (
+  user_id    text        PRIMARY KEY,
+  link_quota integer     NOT NULL DEFAULT 3,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS user_settings_user_id_idx ON user_settings (user_id);
+
 -- ============================================================
 -- FUNCTIONS
 -- ============================================================
@@ -90,4 +99,8 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER links_updated_at
   BEFORE UPDATE ON links
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+CREATE OR REPLACE TRIGGER user_settings_updated_at
+  BEFORE UPDATE ON user_settings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();

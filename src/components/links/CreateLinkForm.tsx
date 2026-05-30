@@ -5,8 +5,14 @@ import { useRouter } from 'next/navigation'
 import { Link2, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-export function CreateLinkForm() {
+interface Props {
+  linkCount: number
+  quota: number
+}
+
+export function CreateLinkForm({ linkCount, quota }: Props) {
   const router = useRouter()
+  const atLimit = linkCount >= quota
   const [url, setUrl] = useState('')
   const [slug, setSlug] = useState('')
   const [title, setTitle] = useState('')
@@ -60,7 +66,21 @@ export function CreateLinkForm() {
       onSubmit={handleSubmit}
       className="bg-white rounded-lg border border-gray-200 p-5 space-y-4"
     >
-      <h2 className="font-semibold text-gray-900">Shorten a URL</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-gray-900">Shorten a URL</h2>
+        <span className={cn(
+          'text-xs font-medium px-2 py-0.5 rounded-full',
+          atLimit ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-500'
+        )}>
+          {linkCount} / {quota} links used
+        </span>
+      </div>
+
+      {atLimit && (
+        <p className="text-sm text-red-600 bg-red-50 rounded-md px-3 py-2">
+          Link limit reached ({quota} max). Contact admin to increase your quota.
+        </p>
+      )}
 
       <div className="flex gap-2">
         <input
@@ -69,18 +89,20 @@ export function CreateLinkForm() {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={atLimit}
+          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-gray-50"
         />
         <button
           type="button"
           onClick={() => setAdvanced((v) => !v)}
-          className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50"
+          disabled={atLimit}
+          className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
         >
           Options {advanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
         <button
           type="submit"
-          disabled={loading || !url}
+          disabled={loading || !url || atLimit}
           className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
@@ -102,7 +124,7 @@ export function CreateLinkForm() {
               value={slug}
               onChange={(e) => { setSlug(e.target.value); checkSlug(e.target.value) }}
               className={cn(
-                'w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500',
+                'w-full rounded-md border px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500',
                 slugStatus === 'taken' ? 'border-red-400' : 'border-gray-300'
               )}
             />
@@ -114,7 +136,7 @@ export function CreateLinkForm() {
               placeholder="My Resume"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -124,7 +146,7 @@ export function CreateLinkForm() {
               placeholder="Optional password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
@@ -135,7 +157,7 @@ export function CreateLinkForm() {
               min="1"
               value={maxClicks}
               onChange={(e) => setMaxClicks(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="col-span-2">
@@ -144,7 +166,7 @@ export function CreateLinkForm() {
               type="datetime-local"
               value={expiresAt}
               onChange={(e) => setExpiresAt(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>

@@ -47,6 +47,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 })
   }
 
+  // Enforce per-user quota
+  const [{ count }, { data: userSettings }] = await Promise.all([
+    supabaseAdmin
+      .from('links')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId),
+    supabaseAdmin
+      .from('user_settings')
+      .select('link_quota')
+      .eq('user_id', userId)
+      .maybeSingle(),
+  ])
+  const quota = userSettings?.link_quota ?? 3
+  if ((count ?? 0) >= quota) {
+    return NextResponse.json(
+      { error: `Link limit reached (${count}/${quota}). Contact admin to increase your quota.` },
+      { status: 403 }
+    )
+  }
+
   const { url, slug: customSlug, title, password, expires_at, max_clicks } = parsed.data
 
   let slug = customSlug

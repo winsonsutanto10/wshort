@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { Link2, BarChart2, Lock, Clock, Zap, Key } from 'lucide-react'
 import { LandingNav } from '@/components/layout/LandingNav'
+import { HeroCta } from '@/components/layout/HeroCta'
 
 export default function LandingPage() {
   return (
@@ -17,20 +17,7 @@ export default function LandingPage() {
           Shorten URLs, track clicks, generate QR codes, and protect links with passwords.
           Built for developers.
         </p>
-        <div className="mt-8 flex justify-center gap-3">
-          <Link
-            href="/sign-up"
-            className="rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-          >
-            Start for free
-          </Link>
-          <Link
-            href="/sign-in"
-            className="rounded-md border border-gray-300 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-          >
-            Sign in
-          </Link>
-        </div>
+        <HeroCta />
       </section>
 
       {/* Features */}
