@@ -24,7 +24,8 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ username, password }),
       })
       if (!res.ok) {
-        setError('Invalid credentials')
+        const data = await res.json().catch(() => ({}))
+        setError(data.error ?? 'Invalid credentials')
         return
       }
       router.push('/admin/panel')

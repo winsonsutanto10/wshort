@@ -25,6 +25,18 @@ async function getOwnedLink(userId: string, id: string) {
   return data
 }
 
+// Lightweight ownership check — only fetches what cache invalidation needs
+async function getLinkOwnership(userId: string, id: string) {
+  const { data, error } = await supabaseAdmin
+    .from('links')
+    .select('id, slug')
+    .eq('id', id)
+    .eq('user_id', userId)
+    .single()
+  if (error || !data) return null
+  return data
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -44,7 +56,7 @@ export async function PATCH(
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
-  const link = await getOwnedLink(userId, id)
+  const link = await getLinkOwnership(userId, id)
   if (!link) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const body = await request.json()
@@ -96,7 +108,7 @@ export async function DELETE(
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const { id } = await params
-  const link = await getOwnedLink(userId, id)
+  const link = await getLinkOwnership(userId, id)
   if (!link) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const { error } = await supabaseAdmin.from('links').delete().eq('id', id)

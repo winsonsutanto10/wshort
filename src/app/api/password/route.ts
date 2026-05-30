@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redis, PW_TOKEN_KEY } from '@/lib/redis/client'
 import { randomBytes } from 'crypto'
 import bcrypt from 'bcryptjs'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 const schema = z.object({
   slug: z.string().min(1),
@@ -11,6 +12,7 @@ const schema = z.object({
 })
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request)
   const body = await request.json()
   const parsed = schema.safeParse(body)
   if (!parsed.success) {
@@ -18,6 +20,12 @@ export async function POST(request: NextRequest) {
   }
 
   const { slug, password } = parsed.data
+
+  // 10 attempts per 60 s per IP+slug
+  const allowed = await rateLimit(`pw:${ip}:${slug}`, 10, 60)
+  if (!allowed) {
+    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
+  }
 
   const { data, error } = await supabaseAdmin
     .from('links')
@@ -43,7 +51,7 @@ export async function POST(request: NextRequest) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 600,
-    path: '/',
+    path: `/${slug}`,
   })
   return response
 }

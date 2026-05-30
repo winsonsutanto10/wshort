@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { cacheSlug, invalidateSlug } from '@/lib/redis/client'
 import { generateSlug, validateSlug } from '@/lib/slug'
+import { DEFAULT_LINK_QUOTA } from '@/lib/constants'
 import bcrypt from 'bcryptjs'
 
 const createLinkSchema = z.object({
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', userId)
       .maybeSingle(),
   ])
-  const quota = userSettings?.link_quota ?? 3
+  const quota = userSettings?.link_quota ?? DEFAULT_LINK_QUOTA
   if ((count ?? 0) >= quota) {
     return NextResponse.json(
       { error: `Link limit reached (${count}/${quota}). Contact admin to increase your quota.` },

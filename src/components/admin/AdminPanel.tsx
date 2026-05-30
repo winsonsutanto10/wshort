@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Shield, LogOut, Loader2, Check, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { DEFAULT_LINK_QUOTA } from '@/lib/constants'
 
 interface UserRow {
   userId: string
@@ -23,6 +24,7 @@ export function AdminPanel() {
   const [saving, setSaving] = useState<string | null>(null)
   const [quotaInputs, setQuotaInputs] = useState<Record<string, string>>({})
   const [saved, setSaved] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
 
@@ -72,6 +74,10 @@ export function AdminPanel() {
       setUsers((prev) => prev.map((u) => u.userId === userId ? { ...u, quota } : u))
       setSaved(userId)
       setTimeout(() => setSaved(null), 2000)
+    } else {
+      const data = await res.json().catch(() => ({}))
+      setSaveError(data.error ?? 'Failed to save quota')
+      setTimeout(() => setSaveError(null), 3000)
     }
   }
 
@@ -97,7 +103,7 @@ export function AdminPanel() {
         <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-sm font-semibold text-gray-700">User Quotas</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Default quota is 3 links per user</p>
+            <p className="text-xs text-gray-400 mt-0.5">Default quota is {DEFAULT_LINK_QUOTA} links per user</p>
           </div>
           <div className="relative w-64">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
@@ -110,6 +116,11 @@ export function AdminPanel() {
           </div>
         </div>
 
+        {saveError && (
+          <p className="px-4 py-2 text-sm text-red-600 bg-red-50 border-b border-red-100">
+            {saveError}
+          </p>
+        )}
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-5 w-5 animate-spin text-gray-400" />

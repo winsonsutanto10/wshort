@@ -26,7 +26,7 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'taken' | 'available'>('idle')
-  const slugDebounce = useRef<ReturnType<typeof setTimeout>>()
+  const slugDebounce = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   function checkSlug(value: string) {
     clearTimeout(slugDebounce.current)

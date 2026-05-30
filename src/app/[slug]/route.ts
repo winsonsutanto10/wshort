@@ -79,7 +79,8 @@ export async function GET(
   if (!purpose.includes('prefetch')) {
     const newCount = await trackClick(linkData.linkId)
     if (linkData.maxClicks > 0 && newCount >= linkData.maxClicks) {
-      void markSlugExpired(slug)
+      await markSlugExpired(slug)
+      return new NextResponse('Link has expired', { status: 410 })
     }
   }
 

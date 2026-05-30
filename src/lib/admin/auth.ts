@@ -2,8 +2,17 @@ import { createHmac, timingSafeEqual } from 'crypto'
 import { cookies } from 'next/headers'
 
 export const ADMIN_COOKIE = 'admin_session'
-const SECRET = process.env.ADMIN_SECRET ?? 'dev-secret-change-me'
 const DURATION = 24 * 60 * 60 * 1000
+
+function requireEnv(name: string): string {
+  const v = process.env[name]
+  if (!v) throw new Error(`${name} is not set. Configure ADMIN_SECRET, ADMIN_USERNAME, and ADMIN_PASSWORD.`)
+  return v
+}
+
+const SECRET = requireEnv('ADMIN_SECRET')
+const ADMIN_USERNAME_ENV = requireEnv('ADMIN_USERNAME')
+const ADMIN_PASSWORD_ENV = requireEnv('ADMIN_PASSWORD')
 
 function sign(payload: string): string {
   const sig = createHmac('sha256', SECRET).update(payload).digest('base64url')
@@ -38,13 +47,13 @@ export async function isAdminAuth(): Promise<boolean> {
 }
 
 export function checkAdminCredentials(username: string, password: string): boolean {
-  const expectedUser = process.env.ADMIN_USERNAME ?? 'admin'
-  const expectedPass = process.env.ADMIN_PASSWORD ?? 'change-me'
-  if (username.length !== expectedUser.length || password.length !== expectedPass.length) return false
+  if (username.length !== ADMIN_USERNAME_ENV.length || password.length !== ADMIN_PASSWORD_ENV.length) {
+    return false
+  }
   try {
     return (
-      timingSafeEqual(Buffer.from(username), Buffer.from(expectedUser)) &&
-      timingSafeEqual(Buffer.from(password), Buffer.from(expectedPass))
+      timingSafeEqual(Buffer.from(username), Buffer.from(ADMIN_USERNAME_ENV)) &&
+      timingSafeEqual(Buffer.from(password), Buffer.from(ADMIN_PASSWORD_ENV))
     )
   } catch {
     return false

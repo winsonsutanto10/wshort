@@ -1,12 +1,13 @@
 import { auth } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { UserButton } from '@clerk/nextjs'
+import { DEFAULT_LINK_QUOTA } from '@/lib/constants'
 
 export default async function SettingsPage() {
   const { userId } = await auth()
   if (!userId) return null
 
-  const [{ count: count }, { data: userSettings }] = await Promise.all([
+  const [{ count: rawCount }, { data: userSettings }] = await Promise.all([
     supabaseAdmin
       .from('links')
       .select('*', { count: 'exact', head: true })
@@ -17,8 +18,8 @@ export default async function SettingsPage() {
       .eq('user_id', userId)
       .maybeSingle(),
   ])
-  const count = count ?? 0
-  const quota = userSettings?.link_quota ?? 3
+  const count = rawCount ?? 0
+  const quota = userSettings?.link_quota ?? DEFAULT_LINK_QUOTA
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
