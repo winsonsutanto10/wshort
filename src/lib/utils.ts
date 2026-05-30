@@ -22,6 +22,7 @@ export function formatDateTime(date: string | null | undefined): string {
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    timeZoneName: 'short',
   }).format(new Date(date))
 }
 
