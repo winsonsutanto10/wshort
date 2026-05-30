@@ -31,17 +31,15 @@ export async function GET(
     return new NextResponse(svg, {
       headers: {
         'Content-Type': 'image/svg+xml',
-        'Content-Disposition': `attachment; filename="qr-${data.slug}.svg"`,
         'Cache-Control': 'public, max-age=3600',
       },
     })
   }
 
   const buffer = await generateQRPng(shortUrl, size)
-  return new NextResponse(buffer.buffer as ArrayBuffer, {
+  return new NextResponse(buffer, {
     headers: {
       'Content-Type': 'image/png',
-      'Content-Disposition': `attachment; filename="qr-${data.slug}.png"`,
       'Cache-Control': 'public, max-age=3600',
     },
   })

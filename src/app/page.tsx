@@ -1,4 +1,4 @@
-import { Link2, BarChart2, Lock, Clock, Zap, Key } from 'lucide-react'
+import { Link2, BarChart2, Lock, Clock, Zap } from 'lucide-react'
 import { LandingNav } from '@/components/layout/LandingNav'
 import { HeroCta } from '@/components/layout/HeroCta'
 
@@ -10,12 +10,11 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="max-w-3xl mx-auto px-4 py-24 text-center">
         <h1 className="text-5xl font-bold text-gray-900 leading-tight">
-          Short links with{' '}
-          <span className="text-blue-600">deep analytics</span>
+          Short links,{' '}
+          <span className="text-blue-600">instantly</span>
         </h1>
         <p className="mt-4 text-lg text-gray-500">
           Shorten URLs, track clicks, generate QR codes, and protect links with passwords.
-          Built for developers.
         </p>
         <HeroCta />
       </section>
@@ -47,7 +46,7 @@ const features = [
   {
     icon: BarChart2,
     title: 'Click analytics',
-    description: 'Track clicks, unique visitors, device, browser, country, and referrers.',
+    description: 'Track total clicks for every link. See what\'s getting traffic at a glance.',
   },
   {
     icon: Link2,
@@ -63,10 +62,5 @@ const features = [
     icon: Lock,
     title: 'Password protection',
     description: 'Gate sensitive links behind a password before redirecting.',
-  },
-  {
-    icon: Key,
-    title: 'API access',
-    description: 'Personal API keys to shorten URLs from the terminal or your own tools.',
   },
 ]
