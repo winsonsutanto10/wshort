@@ -7,7 +7,14 @@ import {
   Copy, Check, Trash2, BarChart2, ExternalLink, Lock, Clock, Hash, Loader2,
 } from 'lucide-react'
 import type { LinkRow } from '@/types'
-import { formatDate, formatNumber, copyToClipboard } from '@/lib/utils'
+import { formatDate, formatDateTime, formatNumber, copyToClipboard } from '@/lib/utils'
+
+function isLinkExpired(link: LinkRow): boolean {
+  const now = Date.now()
+  if (link.expires_at && new Date(link.expires_at).getTime() < now) return true
+  if (link.max_clicks && link.click_count >= link.max_clicks) return true
+  return false
+}
 
 export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
   const router = useRouter()
@@ -60,93 +67,104 @@ export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
-          {links.map((link) => (
-            <tr key={link.id} className="hover:bg-gray-50 group">
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-medium text-blue-600">/{link.slug}</span>
-                  {link.password_hash && (
-                    <span aria-label="Password protected">
-                      <Lock className="h-3 w-3 text-gray-400" />
-                    </span>
+          {links.map((link) => {
+            const expired = isLinkExpired(link)
+            const inactive = !link.is_active || expired
+            return (
+              <tr key={link.id} className={`hover:bg-gray-50 group ${inactive ? 'opacity-60' : ''}`}>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-medium text-blue-600">/{link.slug}</span>
+                    {link.password_hash && (
+                      <span aria-label="Password protected">
+                        <Lock className="h-3 w-3 text-gray-400" />
+                      </span>
+                    )}
+                    {link.expires_at && (
+                      <span aria-label={`Expires ${formatDateTime(link.expires_at)}`}>
+                        <Clock className="h-3 w-3 text-gray-400" />
+                      </span>
+                    )}
+                    {!link.is_active && (
+                      <span className="text-xs bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">inactive</span>
+                    )}
+                    {link.is_active && expired && link.expires_at && new Date(link.expires_at).getTime() < Date.now() && (
+                      <span className="text-xs bg-orange-100 text-orange-600 rounded px-1.5 py-0.5">expired</span>
+                    )}
+                    {link.is_active && expired && link.max_clicks && link.click_count >= link.max_clicks && (
+                      <span className="text-xs bg-orange-100 text-orange-600 rounded px-1.5 py-0.5">limit reached</span>
+                    )}
+                  </div>
+                  {link.title && (
+                    <p className="text-xs text-gray-400 mt-0.5">{link.title}</p>
                   )}
                   {link.expires_at && (
-                    <span aria-label={`Expires ${formatDate(link.expires_at)}`}>
-                      <Clock className="h-3 w-3 text-gray-400" />
-                    </span>
+                    <p className="text-xs text-gray-400 mt-0.5">Expires {formatDateTime(link.expires_at)}</p>
                   )}
-                  {link.max_clicks && (
-                    <span aria-label={`Max ${link.max_clicks} clicks`}>
-                      <Hash className="h-3 w-3 text-gray-400" />
-                    </span>
-                  )}
-                  {!link.is_active && (
-                    <span className="text-xs bg-gray-100 text-gray-500 rounded px-1.5 py-0.5">inactive</span>
-                  )}
-                </div>
-                {link.title && (
-                  <p className="text-xs text-gray-400 mt-0.5">{link.title}</p>
-                )}
-              </td>
-              <td className="px-4 py-3">
-                <a
-                  href={link.original_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-600 hover:text-blue-600 truncate max-w-xs block"
-                >
-                  {link.original_url.replace(/^https?:\/\//, '')}
-                </a>
-              </td>
-              <td className="px-4 py-3 text-right font-medium text-gray-900">
-                {formatNumber(link.click_count)}
-              </td>
-              <td className="px-4 py-3 text-gray-400">{formatDate(link.created_at)}</td>
-              <td className="px-4 py-3">
-                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => handleCopy(link)}
-                    className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-                    title="Copy short URL"
-                  >
-                    {copiedId === link.id ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </button>
-                  <Link
-                    href={`/links/${link.id}`}
-                    className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-                    title="View analytics"
-                  >
-                    <BarChart2 className="h-4 w-4" />
-                  </Link>
+                </td>
+                <td className="px-4 py-3">
                   <a
-                    href={`/${link.slug}`}
+                    href={link.original_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
-                    title="Visit short link"
+                    className="text-gray-600 hover:text-blue-600 truncate max-w-xs block"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    {link.original_url.replace(/^https?:\/\//, '')}
                   </a>
-                  <button
-                    onClick={() => handleDelete(link)}
-                    disabled={deletingId === link.id}
-                    className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 disabled:opacity-50"
-                    title="Delete link"
-                  >
-                    {deletingId === link.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td className="px-4 py-3 text-right font-medium text-gray-900">
+                  {link.max_clicks
+                    ? <span className={link.click_count >= link.max_clicks ? 'text-red-600' : ''}>{formatNumber(link.click_count)} / {formatNumber(link.max_clicks)}</span>
+                    : formatNumber(link.click_count)
+                  }
+                </td>
+                <td className="px-4 py-3 text-gray-400">{formatDate(link.created_at)}</td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleCopy(link)}
+                      className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                      title="Copy short URL"
+                    >
+                      {copiedId === link.id ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </button>
+                    <Link
+                      href={`/links/${link.id}`}
+                      className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                      title="View analytics"
+                    >
+                      <BarChart2 className="h-4 w-4" />
+                    </Link>
+                    <a
+                      href={`/${link.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600"
+                      title="Visit short link"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                    <button
+                      onClick={() => handleDelete(link)}
+                      disabled={deletingId === link.id}
+                      className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 disabled:opacity-50"
+                      title="Delete link"
+                    >
+                      {deletingId === link.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>

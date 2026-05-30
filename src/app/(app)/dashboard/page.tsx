@@ -24,6 +24,13 @@ export default async function DashboardPage() {
   const linkList = links ?? []
   const quota = userSettings?.link_quota ?? 3
   const totalClicks = linkList.reduce((sum, l) => sum + l.click_count, 0)
+  const now = Date.now()
+  const activeLinks = linkList.filter((l) => {
+    if (!l.is_active) return false
+    if (l.expires_at && new Date(l.expires_at).getTime() < now) return false
+    if (l.max_clicks && l.click_count >= l.max_clicks) return false
+    return true
+  }).length
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -36,10 +43,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-3 gap-4">
         <StatCard label="Total Links" value={linkList.length} />
         <StatCard label="Total Clicks" value={totalClicks} />
-        <StatCard
-          label="Active Links"
-          value={linkList.filter((l) => l.is_active).length}
-        />
+        <StatCard label="Active Links" value={activeLinks} />
       </div>
 
       <CreateLinkForm linkCount={linkList.length} quota={quota} />

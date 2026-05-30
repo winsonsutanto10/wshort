@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Copy, Check, ExternalLink, Lock, Clock, Hash } from 'lucide-react'
 import type { LinkRow } from '@/types'
-import { copyToClipboard, formatDate } from '@/lib/utils'
+import { copyToClipboard, formatDate, formatDateTime } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
 
 export function LinkDetailHeader({ link }: { link: LinkRow }) {
@@ -49,7 +49,7 @@ export function LinkDetailHeader({ link }: { link: LinkRow }) {
       <div className="flex gap-4 mt-3 text-sm text-gray-500">
         <span>{link.click_count.toLocaleString()} clicks</span>
         <span>Created {formatDate(link.created_at)}</span>
-        {link.expires_at && <span>Expires {formatDate(link.expires_at)}</span>}
+        {link.expires_at && <span>Expires {formatDateTime(link.expires_at)}</span>}
         {link.max_clicks && <span>Max {link.max_clicks.toLocaleString()} clicks</span>}
       </div>
     </div>

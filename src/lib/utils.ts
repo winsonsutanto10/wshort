@@ -14,6 +14,17 @@ export function formatDate(date: string | null | undefined): string {
   }).format(new Date(date))
 }
 
+export function formatDateTime(date: string | null | undefined): string {
+  if (!date) return '—'
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  }).format(new Date(date))
+}
+
 export function formatNumber(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`

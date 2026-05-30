@@ -19,7 +19,8 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
   const [slug, setSlug] = useState('')
   const [title, setTitle] = useState('')
   const [password, setPassword] = useState('')
-  const [expiresAt, setExpiresAt] = useState('')
+  const [expiresDate, setExpiresDate] = useState('')
+  const [expiresTime, setExpiresTime] = useState('00:00')
   const [maxClicks, setMaxClicks] = useState('')
   const [advanced, setAdvanced] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -43,7 +44,7 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
       if (slug) body.slug = slug
       if (title) body.title = title
       if (password) body.password = password
-      if (expiresAt) body.expires_at = new Date(expiresAt).toISOString()
+      if (expiresDate) body.expires_at = new Date(`${expiresDate}T${expiresTime || '00:00'}`).toISOString()
       if (maxClicks) body.max_clicks = Number(maxClicks)
 
       const res = await fetch('/api/links', {
@@ -56,7 +57,7 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
         setError(typeof data.error === 'string' ? data.error : 'Failed to create link')
         return
       }
-      setUrl(''); setSlug(''); setTitle(''); setPassword(''); setExpiresAt(''); setMaxClicks('')
+      setUrl(''); setSlug(''); setTitle(''); setPassword(''); setExpiresDate(''); setExpiresTime('00:00'); setMaxClicks('')
       router.refresh()
     } finally {
       setLoading(false)
@@ -156,12 +157,26 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
               onChange={(e) => setMaxClicks(e.target.value)}
             />
           </div>
-          <div className="col-span-2">
-            <label className="block text-xs font-medium text-gray-600 mb-1">Expires at</label>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Expires — date</label>
             <Input
-              type="datetime-local"
-              value={expiresAt}
-              onChange={(e) => setExpiresAt(e.target.value)}
+              type="date"
+              value={expiresDate}
+              onChange={(e) => setExpiresDate(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">
+              Expires — time
+              <span className="text-gray-400 font-normal ml-1">
+                ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+              </span>
+            </label>
+            <Input
+              type="time"
+              value={expiresTime}
+              onChange={(e) => setExpiresTime(e.target.value)}
+              disabled={!expiresDate}
             />
           </div>
         </div>
