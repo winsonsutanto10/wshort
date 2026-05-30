@@ -3,6 +3,7 @@
 import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, Loader2 } from 'lucide-react'
+import { Input } from '@/components/ui/Input'
 
 export default function PasswordPage({
   params,
@@ -49,14 +50,13 @@ export default function PasswordPage({
           This link is password-protected. Enter the password to continue.
         </p>
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input
+          <Input
             type="password"
             placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoFocus
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {error && <p className="text-sm text-red-500">{error}</p>}
           <button

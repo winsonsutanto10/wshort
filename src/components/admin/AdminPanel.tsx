@@ -3,9 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { Shield, LogOut, Loader2, Check } from 'lucide-react'
+import { Input } from '@/components/ui/Input'
 
 interface UserRow {
   userId: string
+  name: string
+  email: string | null
   linkCount: number
   quota: number
 }
@@ -85,7 +88,7 @@ export function AdminPanel() {
           <table className="w-full text-sm">
             <thead className="border-b border-gray-200">
               <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-500">User ID</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500">User</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500">Links used</th>
                 <th className="text-right px-4 py-3 font-medium text-gray-500">Quota</th>
                 <th className="px-4 py-3" />
@@ -95,15 +98,18 @@ export function AdminPanel() {
               {users.map((user) => (
                 <tr key={user.userId} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <span className="font-mono text-xs text-gray-600">{user.userId}</span>
+                    <p className="font-medium text-gray-900">{user.name}</p>
+                    {user.email && (
+                      <p className="text-xs text-gray-400 mt-0.5">{user.email}</p>
+                    )}
                   </td>
-                  <td className="px-4 py-3 text-right text-gray-700">
-                    <span className={user.linkCount >= user.quota ? 'text-red-600 font-medium' : ''}>
+                  <td className="px-4 py-3 text-right">
+                    <span className={user.linkCount >= user.quota ? 'text-red-600 font-medium' : 'text-gray-700'}>
                       {user.linkCount} / {user.quota}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <input
+                    <Input
                       type="number"
                       min={1}
                       max={1000}
@@ -111,7 +117,7 @@ export function AdminPanel() {
                       onChange={(e) =>
                         setQuotaInputs((prev) => ({ ...prev, [user.userId]: e.target.value }))
                       }
-                      className="w-20 rounded border border-gray-300 px-2 py-1 text-sm text-gray-900 text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-20 text-right"
                     />
                   </td>
                   <td className="px-4 py-3 text-right">

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Link2, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/Input'
 
 interface Props {
   linkCount: number
@@ -83,14 +84,14 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
       )}
 
       <div className="flex gap-2">
-        <input
+        <Input
           type="url"
           placeholder="https://example.com/very-long-url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           required
           disabled={atLimit}
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:bg-gray-50"
+          className="flex-1"
         />
         <button
           type="button"
@@ -118,55 +119,48 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
               {slugStatus === 'taken' && <span className="text-red-500 ml-2">Taken</span>}
               {slugStatus === 'available' && <span className="text-green-600 ml-2">Available</span>}
             </label>
-            <input
+            <Input
               type="text"
               placeholder="my-resume"
               value={slug}
               onChange={(e) => { setSlug(e.target.value); checkSlug(e.target.value) }}
-              className={cn(
-                'w-full rounded-md border px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500',
-                slugStatus === 'taken' ? 'border-red-400' : 'border-gray-300'
-              )}
+              className={cn(slugStatus === 'taken' && 'border-red-400')}
             />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Title</label>
-            <input
+            <Input
               type="text"
               placeholder="My Resume"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Password</label>
-            <input
+            <Input
               type="password"
               placeholder="Optional password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Max clicks</label>
-            <input
+            <Input
               type="number"
               placeholder="Unlimited"
               min="1"
               value={maxClicks}
               onChange={(e) => setMaxClicks(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="col-span-2">
             <label className="block text-xs font-medium text-gray-600 mb-1">Expires at</label>
-            <input
+            <Input
               type="datetime-local"
               value={expiresAt}
               onChange={(e) => setExpiresAt(e.target.value)}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>

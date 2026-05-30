@@ -14,9 +14,6 @@ const SLUG_TTL = 60 * 60 * 24 // 24 hours
 const EXPIRED_TTL = 60 * 60 // 1 hour tombstone
 
 export const SLUG_KEY = (slug: string) => `slug:${slug}`
-export const CLICKS_KEY = (linkId: string, date: string) => `clicks:${linkId}:${date}`
-export const UV_KEY = (linkId: string, date: string) => `uv:${linkId}:${date}`
-export const RATELIMIT_KEY = (ip: string) => `ratelimit:${ip}`
 export const PW_TOKEN_KEY = (slug: string, token: string) => `pw_token:${slug}:${token}`
 
 export function serializeSlugValue(v: RedisSlugValue): string {
@@ -63,20 +60,6 @@ export async function getSlugValue(slug: string): Promise<RedisSlugValue | 'EXPI
   if (raw === null) return null
   if (raw === 'EXPIRED') return 'EXPIRED'
   return deserializeSlugValue(raw)
-}
-
-export async function incrementDailyClicks(linkId: string): Promise<void> {
-  const date = new Date().toISOString().split('T')[0]
-  const key = CLICKS_KEY(linkId, date)
-  await redis.incr(key)
-  await redis.expire(key, 60 * 60 * 24 * 8)
-}
-
-export async function addUniqueVisitor(linkId: string, ipHash: string): Promise<void> {
-  const date = new Date().toISOString().split('T')[0]
-  const key = UV_KEY(linkId, date)
-  await redis.pfadd(key, ipHash)
-  await redis.expire(key, 60 * 60 * 24 * 8)
 }
 
 export async function markSlugExpiredIfNeeded(slug: string) {
