@@ -1,10 +1,10 @@
 'use client'
 
 import { Download } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 export function QRDisplay({ linkId, slug }: { linkId: string; slug: string }) {
   const pngUrl = `/api/links/${linkId}/qr?format=png&size=300`
-  const svgUrl = `/api/links/${linkId}/qr?format=svg&size=300`
 
   async function download(format: 'png' | 'svg') {
     const res = await fetch(`/api/links/${linkId}/qr?format=${format}&size=400`)
@@ -26,20 +26,14 @@ export function QRDisplay({ linkId, slug }: { linkId: string; slug: string }) {
         className="w-full aspect-square rounded-md"
       />
       <div className="flex gap-2 mt-3">
-        <button
-          onClick={() => download('png')}
-          className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-gray-300 px-3 py-2 text-xs hover:bg-gray-50"
-        >
+        <Button variant="secondary" size="sm" className="flex-1" onClick={() => download('png')}>
           <Download className="h-3.5 w-3.5" />
           PNG
-        </button>
-        <button
-          onClick={() => download('svg')}
-          className="flex-1 flex items-center justify-center gap-1.5 rounded-md border border-gray-300 px-3 py-2 text-xs hover:bg-gray-50"
-        >
+        </Button>
+        <Button variant="secondary" size="sm" className="flex-1" onClick={() => download('svg')}>
           <Download className="h-3.5 w-3.5" />
           SVG
-        </button>
+        </Button>
       </div>
     </div>
   )

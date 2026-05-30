@@ -7,7 +7,7 @@ import {
   Copy, Check, Trash2, BarChart2, ExternalLink, Lock, Clock, Hash, Loader2,
 } from 'lucide-react'
 import type { LinkRow } from '@/types'
-import { cn, formatDate, formatNumber, copyToClipboard } from '@/lib/utils'
+import { formatDate, formatNumber, copyToClipboard } from '@/lib/utils'
 
 export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
   const router = useRouter()
@@ -32,6 +32,7 @@ export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
       const res = await fetch(`/api/links/${link.id}`, { method: 'DELETE' })
       if (res.ok) {
         setLinks((prev) => prev.filter((l) => l.id !== link.id))
+        router.refresh()
       }
     } finally {
       setDeletingId(null)
@@ -48,7 +49,7 @@ export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-      <table className="w-full text-sm">
+      <table className="w-full text-sm text-gray-900">
         <thead className="border-b border-gray-200 bg-gray-50">
           <tr>
             <th className="text-left px-4 py-3 font-medium text-gray-500">Link</th>
@@ -133,7 +134,7 @@ export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
                   <button
                     onClick={() => handleDelete(link)}
                     disabled={deletingId === link.id}
-                    className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500"
+                    className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500 disabled:opacity-50"
                     title="Delete link"
                   >
                     {deletingId === link.id ? (

@@ -4,6 +4,7 @@ import { useState, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { Lock, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/Button'
 
 export default function PasswordPage({
   params,
@@ -59,14 +60,10 @@ export default function PasswordPage({
             autoFocus
           />
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <button
-            type="submit"
-            disabled={loading || !password}
-            className="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
+          <Button type="submit" variant="primary" disabled={loading || !password} className="w-full">
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             Continue
-          </button>
+          </Button>
         </form>
       </div>
     </div>

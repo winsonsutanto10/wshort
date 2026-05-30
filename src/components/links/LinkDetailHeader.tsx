@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Copy, Check, ExternalLink, Lock, Clock, Hash } from 'lucide-react'
 import type { LinkRow } from '@/types'
 import { copyToClipboard, formatDate } from '@/lib/utils'
+import { Button } from '@/components/ui/Button'
 
 export function LinkDetailHeader({ link }: { link: LinkRow }) {
   const [copied, setCopied] = useState(false)
@@ -40,15 +41,10 @@ export function LinkDetailHeader({ link }: { link: LinkRow }) {
             <ExternalLink className="h-3 w-3" />
           </a>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleCopy}
-            className="flex items-center gap-2 rounded-md border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50"
-          >
-            {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-            {copied ? 'Copied!' : 'Copy link'}
-          </button>
-        </div>
+        <Button variant="secondary" onClick={handleCopy}>
+          {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+          {copied ? 'Copied!' : 'Copy link'}
+        </Button>
       </div>
       <div className="flex gap-4 mt-3 text-sm text-gray-500">
         <span>{link.click_count.toLocaleString()} clicks</span>

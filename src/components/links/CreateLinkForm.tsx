@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Link2, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/Button'
 
 interface Props {
   linkCount: number
@@ -93,22 +94,22 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
           disabled={atLimit}
           className="flex-1"
         />
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={() => setAdvanced((v) => !v)}
           disabled={atLimit}
-          className="flex items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50"
         >
           Options {advanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
+          variant="primary"
           disabled={loading || !url || atLimit}
-          className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}
           Shorten
-        </button>
+        </Button>
       </div>
 
       {advanced && (
