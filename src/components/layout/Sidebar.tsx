@@ -18,7 +18,7 @@ export function Sidebar() {
       <div className="h-14 flex items-center px-5 border-b border-gray-200">
         <Link href="/dashboard" className="flex items-center gap-2 font-bold text-gray-900">
           <Link2 className="h-5 w-5 text-blue-600" />
-          <span>Snip</span>
+          <span>Wshort</span>
         </Link>
       </div>
       <nav className="flex-1 p-3 space-y-1">

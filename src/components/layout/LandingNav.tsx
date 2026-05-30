@@ -12,7 +12,7 @@ export function LandingNav() {
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <div className="flex items-center gap-2 font-bold text-gray-900">
           <Link2 className="h-5 w-5 text-blue-600" />
-          Snip
+          Wshort
         </div>
         <div className="flex items-center gap-3">
           {isLoaded && isSignedIn ? (

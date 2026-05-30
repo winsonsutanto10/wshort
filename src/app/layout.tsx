@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Snip — URL Shortener",
+  title: "Wshort — URL Shortener",
   description: "Shorten, track, and manage your links",
 }
 
