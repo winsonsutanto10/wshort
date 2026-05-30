@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Link2, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -26,13 +26,17 @@ export function CreateLinkForm({ linkCount, quota }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'taken' | 'available'>('idle')
+  const slugDebounce = useRef<ReturnType<typeof setTimeout>>()
 
-  async function checkSlug(value: string) {
+  function checkSlug(value: string) {
+    clearTimeout(slugDebounce.current)
     if (!value) { setSlugStatus('idle'); return }
     setSlugStatus('checking')
-    const res = await fetch(`/api/links/check-slug?slug=${encodeURIComponent(value)}`)
-    const data = await res.json()
-    setSlugStatus(data.available ? 'available' : 'taken')
+    slugDebounce.current = setTimeout(async () => {
+      const res = await fetch(`/api/links/check-slug?slug=${encodeURIComponent(value)}`)
+      const data = await res.json()
+      setSlugStatus(data.available ? 'available' : 'taken')
+    }, 300)
   }
 
   async function handleSubmit(e: React.FormEvent) {

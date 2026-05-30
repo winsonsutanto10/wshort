@@ -6,10 +6,10 @@ export default async function SettingsPage() {
   const { userId } = await auth()
   if (!userId) return null
 
-  const [{ data: links }, { data: userSettings }] = await Promise.all([
+  const [{ count: count }, { data: userSettings }] = await Promise.all([
     supabaseAdmin
       .from('links')
-      .select('id', { count: 'exact', head: false })
+      .select('*', { count: 'exact', head: true })
       .eq('user_id', userId),
     supabaseAdmin
       .from('user_settings')
@@ -17,8 +17,7 @@ export default async function SettingsPage() {
       .eq('user_id', userId)
       .maybeSingle(),
   ])
-
-  const linkCount = links?.length ?? 0
+  const count = count ?? 0
   const quota = userSettings?.link_quota ?? 3
 
   return (
@@ -40,15 +39,15 @@ export default async function SettingsPage() {
         <h2 className="font-semibold text-gray-900">Link Quota</h2>
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-600">Links used</p>
-          <span className="text-sm font-semibold text-gray-900">{linkCount} / {quota}</span>
+          <span className="text-sm font-semibold text-gray-900">{count} / {quota}</span>
         </div>
         <div className="w-full bg-gray-100 rounded-full h-2">
           <div
             className="bg-blue-500 h-2 rounded-full transition-all"
-            style={{ width: `${Math.min(100, Math.round((linkCount / quota) * 100))}%` }}
+            style={{ width: `${Math.min(100, Math.round((count / quota) * 100))}%` }}
           />
         </div>
-        {linkCount >= quota && (
+        {count >= quota && (
           <p className="text-xs text-red-600">
             Limit reached. Contact an admin to increase your quota.
           </p>

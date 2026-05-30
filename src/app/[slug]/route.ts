@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { getSlugValue, cacheSlug, markSlugExpired } from '@/lib/redis/client'
+import { getSlugValue, cacheSlug, markSlugExpired, redis, PW_TOKEN_KEY } from '@/lib/redis/client'
 import { trackClick } from '@/lib/analytics/track'
 
 export const runtime = 'nodejs'
@@ -68,10 +68,9 @@ export async function GET(
   // 4. Check password protection
   if (linkData.hasPassword) {
     const pwCookie = request.cookies.get(`pw_verified_${slug}`)?.value
-    if (!pwCookie) {
-      return NextResponse.redirect(
-        new URL(`/password/${slug}`, request.url)
-      )
+    const valid = pwCookie ? await redis.get(PW_TOKEN_KEY(slug, pwCookie)) : null
+    if (!valid) {
+      return NextResponse.redirect(new URL(`/password/${slug}`, request.url))
     }
   }
 
@@ -84,6 +83,9 @@ export async function GET(
     }
   }
 
-  // 6. Redirect
+  // 6. Redirect — guard against non-http(s) URLs stored in DB
+  if (!/^https?:\/\//i.test(linkData.originalUrl)) {
+    return new NextResponse('Invalid redirect target', { status: 400 })
+  }
   return NextResponse.redirect(linkData.originalUrl, { status: 302 })
 }

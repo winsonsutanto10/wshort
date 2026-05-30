@@ -7,14 +7,7 @@ import {
   Copy, Check, Trash2, BarChart2, ExternalLink, Lock, Clock, Hash, Loader2,
 } from 'lucide-react'
 import type { LinkRow } from '@/types'
-import { formatDate, formatDateTime, formatNumber, copyToClipboard } from '@/lib/utils'
-
-function isLinkExpired(link: LinkRow): boolean {
-  const now = Date.now()
-  if (link.expires_at && new Date(link.expires_at).getTime() < now) return true
-  if (link.max_clicks && link.click_count >= link.max_clicks) return true
-  return false
-}
+import { formatDate, formatDateTime, formatNumber, copyToClipboard, isLinkExpired } from '@/lib/utils'
 
 export function LinkTable({ initialLinks }: { initialLinks: LinkRow[] }) {
   const router = useRouter()

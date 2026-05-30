@@ -62,6 +62,3 @@ export async function getSlugValue(slug: string): Promise<RedisSlugValue | 'EXPI
   return deserializeSlugValue(raw)
 }
 
-export async function markSlugExpiredIfNeeded(slug: string) {
-  await markSlugExpired(slug)
-}

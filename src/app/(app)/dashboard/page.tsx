@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { CreateLinkForm } from '@/components/links/CreateLinkForm'
 import { LinkTable } from '@/components/links/LinkTable'
+import { isLinkExpired } from '@/lib/utils'
 
 export default async function DashboardPage() {
   const { userId } = await auth()
@@ -24,13 +25,7 @@ export default async function DashboardPage() {
   const linkList = links ?? []
   const quota = userSettings?.link_quota ?? 3
   const totalClicks = linkList.reduce((sum, l) => sum + l.click_count, 0)
-  const now = Date.now()
-  const activeLinks = linkList.filter((l) => {
-    if (!l.is_active) return false
-    if (l.expires_at && new Date(l.expires_at).getTime() < now) return false
-    if (l.max_clicks && l.click_count >= l.max_clicks) return false
-    return true
-  }).length
+  const activeLinks = linkList.filter((l) => !isLinkExpired(l)).length
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
