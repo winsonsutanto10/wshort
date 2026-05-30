@@ -75,10 +75,14 @@ export async function GET(
     }
   }
 
-  // 5. Fire analytics async (non-blocking)
-  const linkId = linkData.linkId
-  request.clone() // ensure request is readable in background
-  void Promise.resolve().then(() => trackClick(request, linkId, slug))
+  // 5. Skip tracking for browser prefetch requests
+  const purpose = request.headers.get('Purpose') ?? request.headers.get('Sec-Purpose') ?? ''
+  if (!purpose.includes('prefetch')) {
+    const newCount = await trackClick(linkData.linkId)
+    if (linkData.maxClicks > 0 && newCount >= linkData.maxClicks) {
+      void markSlugExpired(slug)
+    }
+  }
 
   // 6. Redirect
   return NextResponse.redirect(linkData.originalUrl, { status: 302 })

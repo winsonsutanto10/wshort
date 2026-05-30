@@ -37,7 +37,7 @@ export async function GET(
   }
 
   const buffer = await generateQRPng(shortUrl, size)
-  return new NextResponse(buffer, {
+  return new NextResponse(buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer, {
     headers: {
       'Content-Type': 'image/png',
       'Cache-Control': 'public, max-age=3600',

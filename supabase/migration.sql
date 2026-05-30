@@ -44,11 +44,15 @@ CREATE INDEX IF NOT EXISTS user_settings_user_id_idx
 -- FUNCTIONS
 -- ============================================================
 
--- Atomic click count increment used by redirect route
+-- Atomic click count increment — returns new count so caller can enforce max_clicks
 CREATE OR REPLACE FUNCTION increment_click_count(link_id_param uuid)
-RETURNS void AS $$
+RETURNS integer AS $$
+DECLARE
+  new_count integer;
 BEGIN
-  UPDATE links SET click_count = click_count + 1 WHERE id = link_id_param;
+  UPDATE links SET click_count = click_count + 1 WHERE id = link_id_param
+  RETURNING click_count INTO new_count;
+  RETURN COALESCE(new_count, 0);
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
